@@ -110,16 +110,6 @@ jobs:
             if (-not (Test-Path "pkg\$required")) { throw "pkg is missing $required." }
           }
 
-      - name: Smoke test of scantailor-cli
-        shell: pwsh
-        continue-on-error: true
-        run: |
-          # The CLI uses the offscreen platform plugin, so we record if windeployqt put it in the package.
-          Get-ChildItem pkg\platforms | Select-Object Name
-          if (-not (Test-Path pkg\scantailor-cli.exe)) { throw 'pkg is missing scantailor-cli.exe.' }
-          & pkg\scantailor-cli.exe --help
-          "help exit code: $LASTEXITCODE"
-
       - name: Create zip
         shell: pwsh
         run: Compress-Archive -Path pkg\* -DestinationPath "scantailor-advanced-${{ steps.version.outputs.value }}-x64.zip"
@@ -135,6 +125,27 @@ jobs:
           name: scantailor-windows-x64
           path: scantailor-advanced-*-x64.zip
           if-no-files-found: error
+
+      - name: Smoke test of scantailor-cli (no GUI message boxes)
+        shell: pwsh
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          QT_COMMAND_LINE_PARSER_NO_GUI_MESSAGE_BOXES: '1'
+        run: |
+          # The CLI uses the offscreen platform plugin, so we record if windeployqt put it in the package.
+          Get-ChildItem pkg\platforms | Select-Object Name
+          & pkg\scantailor-cli.exe --help
+          "help exit code: $LASTEXITCODE"
+
+      - name: Smoke test of scantailor-cli (defaults)
+        shell: pwsh
+        continue-on-error: true
+        timeout-minutes: 3
+        run: |
+          # Without a console window, Qt can show help in a message box, which blocks a CI run.
+          & pkg\scantailor-cli.exe --help
+          "help exit code: $LASTEXITCODE"
 
       - name: Attach to the release
         if: github.ref_type == 'tag'
