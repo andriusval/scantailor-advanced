@@ -105,8 +105,11 @@ jobs:
             Copy-Item (Join-Path $crt.FullName $dll) pkg -Force
           }
 
+          # windeployqt deploys only qwindows.dll, but scantailor-cli starts on the offscreen platform plugin.
+          Copy-Item "$env:QT_ROOT_DIR\plugins\platforms\qoffscreen.dll" pkg\platforms -Force
+
           # A portable zip is useless without the platform plugin and the Qt core DLL.
-          foreach ($required in @('Qt6Core.dll', 'platforms\qwindows.dll', 'msvcp140.dll')) {
+          foreach ($required in @('Qt6Core.dll', 'platforms\qwindows.dll', 'platforms\qoffscreen.dll', 'msvcp140.dll')) {
             if (-not (Test-Path "pkg\$required")) { throw "pkg is missing $required." }
           }
 
@@ -133,7 +136,8 @@ jobs:
         env:
           QT_COMMAND_LINE_PARSER_NO_GUI_MESSAGE_BOXES: '1'
         run: |
-          # The CLI uses the offscreen platform plugin, so we record if windeployqt put it in the package.
+          # Without QT_PLUGIN_PATH, the CLI must find the platform plugin in the package, as on a user machine.
+          Remove-Item Env:QT_PLUGIN_PATH
           Get-ChildItem pkg\platforms | Select-Object Name
           & pkg\scantailor-cli.exe --help
           "help exit code: $LASTEXITCODE"
