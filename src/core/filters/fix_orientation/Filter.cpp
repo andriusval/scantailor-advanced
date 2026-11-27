@@ -19,11 +19,15 @@
 #include "Settings.h"
 #include "Task.h"
 #include "Utils.h"
+#include "Application.h"
 
 namespace fix_orientation {
 Filter::Filter(const PageSelectionAccessor& pageSelectionAccessor)
     : m_settings(std::make_shared<Settings>()), m_imageSettings(std::make_shared<ImageSettings>()) {
-  m_optionsWidget.reset(new OptionsWidget(m_settings, pageSelectionAccessor));
+  // scantailor-cli has no widgets; the batch tasks do not use the options widget.
+  if (Application::hasWidgets()) {
+    m_optionsWidget.reset(new OptionsWidget(m_settings, pageSelectionAccessor));
+  }
 }
 
 Filter::~Filter() = default;

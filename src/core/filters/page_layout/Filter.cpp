@@ -22,11 +22,15 @@
 #include "Settings.h"
 #include "Task.h"
 #include "Utils.h"
+#include "Application.h"
 
 namespace page_layout {
 Filter::Filter(std::shared_ptr<ProjectPages> pages, const PageSelectionAccessor& pageSelectionAccessor)
     : m_pages(std::move(pages)), m_settings(std::make_shared<Settings>()), m_selectedPageOrder(0) {
-  m_optionsWidget.reset(new OptionsWidget(m_settings, m_pages, pageSelectionAccessor));
+  // scantailor-cli has no widgets; the batch tasks do not use the options widget.
+  if (Application::hasWidgets()) {
+    m_optionsWidget.reset(new OptionsWidget(m_settings, m_pages, pageSelectionAccessor));
+  }
 
   const PageOrderOption::ProviderPtr defaultOrder;
   const auto orderByWidth = std::make_shared<OrderByWidthProvider>(m_settings);
