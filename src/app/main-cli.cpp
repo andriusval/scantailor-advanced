@@ -110,7 +110,13 @@ int main(int argc, char* argv[]) {
   p.addOption({"rtl", "Right-to-left page order (images mode)."});
   p.addOption({{"j", "threads"}, "Parallel pages per stage. Default: number of CPUs.", "n"});
   p.addOption({{"v", "verbose"}, "Print stages and pages."});
-  p.process(app);
+  // QCommandLineParser::process() exits with status 1 on a bad option, but 1 means that pages failed.
+  if (!p.parse(app.arguments())) {
+    return fail(p.errorText() + " (see --help)");
+  }
+  if (p.isSet("help") || p.isSet("help-all")) {
+    p.process(app);
+  }
 
   const QStringList images = p.positionalArguments();
   const QString project = p.value("project");
