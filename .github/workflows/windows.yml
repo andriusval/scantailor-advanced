@@ -4,7 +4,7 @@ name: Windows
 
 on:
   push:
-    branches: [master, main]
+    branches: [master, main, 'test/**']
     tags:
       - 'v*'
   pull_request:
@@ -125,6 +125,30 @@ jobs:
           name: scantailor-windows-x64
           path: scantailor-advanced-*-x64.zip
           if-no-files-found: error
+
+      - name: Smoke test of scantailor-cli
+        shell: pwsh
+        timeout-minutes: 5
+        run: |
+          # As on a user machine: no Qt install on the path, and the package has no offscreen plugin.
+          Remove-Item Env:QT_PLUGIN_PATH -ErrorAction SilentlyContinue
+          Get-ChildItem pkg\platforms | Select-Object Name
+          & pkg\scantailor-cli.exe --help
+          if ($LASTEXITCODE -ne 0) { throw "help exit code $LASTEXITCODE" }
+          Add-Type -AssemblyName System.Drawing
+          New-Item -ItemType Directory -Force -Path smoke | Out-Null
+          foreach ($n in 1..3) {
+            $bmp = New-Object System.Drawing.Bitmap 1200, 1600
+            $g = [System.Drawing.Graphics]::FromImage($bmp)
+            $g.Clear([System.Drawing.Color]::White)
+            $font = New-Object System.Drawing.Font 'Arial', 28
+            foreach ($line in 0..30) { $g.DrawString("Line $line of page $n with some words", $font, [System.Drawing.Brushes]::Black, 120, 120 + 40 * $line) }
+            $bmp.SetResolution(300, 300)
+            $bmp.Save("smoke\page-$n.png", [System.Drawing.Imaging.ImageFormat]::Png)
+          }
+          & pkg\scantailor-cli.exe -v -o "smoke\išvestis ąčę" (Get-ChildItem smoke\*.png).FullName
+          if ($LASTEXITCODE -ne 0) { throw "processing exit code $LASTEXITCODE" }
+          Get-ChildItem "smoke\išvestis ąčę" -Filter *.tif | Select-Object Name, Length
 
       - name: Attach to the release
         if: github.ref_type == 'tag'
