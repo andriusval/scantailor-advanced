@@ -28,7 +28,7 @@ class Application : public QApplication {
   // False in scantailor-cli: it runs on a QCoreApplication, which cannot make widgets.
   static bool hasWidgets();
 
-  // Finds the portable config directory next to the executable; scantailor-cli calls it without an Application object.
+  // Static, because scantailor-cli has no Application object.
   static QString findPortableConfigPath();
 
  private:

@@ -8,6 +8,7 @@
 
 #include <utility>
 
+#include "Application.h"
 #include "CacheDrivenTask.h"
 #include "FilterUiInterface.h"
 #include "OptionsWidget.h"
@@ -18,7 +19,6 @@
 #include "Settings.h"
 #include "Task.h"
 #include "Utils.h"
-#include "Application.h"
 
 namespace page_split {
 Filter::Filter(std::shared_ptr<ProjectPages> pageSequence, const PageSelectionAccessor& pageSelectionAccessor)

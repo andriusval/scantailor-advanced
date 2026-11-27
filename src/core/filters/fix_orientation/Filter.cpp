@@ -9,6 +9,7 @@
 #include <QCoreApplication>
 #include <utility>
 
+#include "Application.h"
 #include "CacheDrivenTask.h"
 #include "FilterUiInterface.h"
 #include "ImageSettings.h"
@@ -19,7 +20,6 @@
 #include "Settings.h"
 #include "Task.h"
 #include "Utils.h"
-#include "Application.h"
 
 namespace fix_orientation {
 Filter::Filter(const PageSelectionAccessor& pageSelectionAccessor)

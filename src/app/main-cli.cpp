@@ -59,9 +59,9 @@ bool parseStage(const QCommandLineParser& parser, const QString& name, const int
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  // A QCoreApplication needs no Qt platform plugin and no display; the filters create no widgets without QApplication.
+  // A QCoreApplication needs no Qt platform plugin and no display; without a QApplication the filters make no widgets.
   QCoreApplication app(argc, argv);
-  // On Windows, without a console window, QCommandLineParser shows help and errors in a message box that blocks scripts.
+  // Without a console, QCommandLineParser on Windows shows help and errors in a message box that blocks scripts.
   qputenv("QT_COMMAND_LINE_PARSER_NO_GUI_MESSAGE_BOXES", "1");
 
 #ifdef _WIN32

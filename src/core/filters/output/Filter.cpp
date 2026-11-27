@@ -7,6 +7,7 @@
 
 #include <utility>
 
+#include "Application.h"
 #include "CacheDrivenTask.h"
 #include "FilterUiInterface.h"
 #include "OptionsWidget.h"
@@ -16,7 +17,6 @@
 #include "Task.h"
 #include "ThumbnailPixmapCache.h"
 #include "Utils.h"
-#include "Application.h"
 
 namespace output {
 Filter::Filter(const PageSelectionAccessor& pageSelectionAccessor)
